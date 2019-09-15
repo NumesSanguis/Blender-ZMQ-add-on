@@ -16,6 +16,8 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+# Copyright (c) Stef van der Struijk
+
 
 bl_info = {
     "name": "blendzmq",

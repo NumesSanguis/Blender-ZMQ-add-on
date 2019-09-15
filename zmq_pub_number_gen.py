@@ -11,18 +11,20 @@ def main(ip="127.0.0.1"):
     url = "tcp://{}:5550".format(ip)
     ctx = zmq.Context()
     socket = ctx.socket(zmq.PUB)
-    socket.bind(url)  # publisher connects to subscriber
+    socket.connect(url)  # publisher connects to subscriber
     print("Pub connected to: {}\nSending data...".format(url))
 
     i = 0
     topic = 'foo'.encode('ascii')
 
+    # keep sending messages until program interruption
     while True:
         # user_msg = input("Please type a message to send: ")
         msg = str(i).encode('utf-8')
         # publish data
         socket.send_multipart([topic, msg])  # 'test'.format(i)
         print("On topic {}, send data: {}".format(topic, msg))
+        # 100 fps
         time.sleep(.01)
 
         i += 1

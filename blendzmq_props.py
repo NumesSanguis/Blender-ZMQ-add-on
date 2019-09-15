@@ -16,6 +16,8 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+# Copyright (c) Stef van der Struijk
+
 import bpy
 from bpy.types import (
         PropertyGroup,
@@ -47,6 +49,10 @@ class ZMQSocketProperties(PropertyGroup):
     msg_received: StringProperty(name="Received msg",
                                  description="Message received from ZMQ subscriber socket",
                                  default="Awaiting msg...",
+                                 )
+    dynamic_object: BoolProperty(name="Dynamic object",
+                                 description="Stream data to selected object (False: stream to same object)",
+                                 default=True
                                  )
     # reload_module_name: StringProperty(name="Name",
     #                                    description="Reload this module",

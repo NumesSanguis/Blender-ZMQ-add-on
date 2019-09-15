@@ -16,6 +16,8 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+# Copyright (c) Stef van der Struijk
+
 import bpy
 from bpy.types import Panel
 
@@ -44,6 +46,7 @@ class BLENDZMQ_PT_zmqConnector(Panel):
         # layout.operator("bpy.ops.script.reload()")
         row.prop(socket_settings, "socket_ip")
         row.prop(socket_settings, "socket_port", text="port")
+        layout.prop(socket_settings, "dynamic_object")
         # if our socket hasn't connected yet
         if not socket_settings.socket_connected:
             layout.operator("socket.connect_subscriber")  # , text="Connect Socket"
