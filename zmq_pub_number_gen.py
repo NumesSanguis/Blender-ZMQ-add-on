@@ -24,8 +24,8 @@ def main(ip="127.0.0.1"):
         # publish data
         socket.send_multipart([topic, msg])  # 'test'.format(i)
         print("On topic {}, send data: {}".format(topic, msg))
-        # 100 fps
-        time.sleep(.01)
+        # 60 fps
+        time.sleep(1/60)
 
         i += 1
         if i > 100:

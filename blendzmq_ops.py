@@ -20,7 +20,10 @@
 
 
 import bpy
-import zmq
+import sys
+import subprocess
+from pathlib import Path  # Object-oriented filesystem paths since Python 3.4
+# import zmq
 import functools
 # import selection_utils
 from bpy.types import Operator
@@ -96,6 +99,9 @@ class SOCKET_OT_connect_subscriber(bpy.types.Operator):
     #     return 0.2
 
     def execute(self, context):  # execute() is called when running the operator.
+        # if this operator can be triggered thought an interface button, pyzmq has been installed
+        import zmq
+
         # self.blend_ctx = context
         #print(dir(self.blend_ctx))
         self.socket_settings = context.window_manager.socket_settings
@@ -154,7 +160,7 @@ class SOCKET_OT_connect_subscriber(bpy.types.Operator):
                 topic, msg = socket_sub.recv_multipart()
                 print("On topic {}, received data: {}".format(topic, msg))
                 # context stays the same as when started?
-                # self.socket_sub_settings.msg_received = msg.decode('utf-8')
+                self.socket_settings.msg_received = msg.decode('utf-8')
 
                 # update selected obj as long as Dynamic object is on
                 if self.socket_settings.dynamic_object:
@@ -257,12 +263,58 @@ class SOCKET_OT_connect_subscriber(bpy.types.Operator):
     #     return 0.001
 
 
+class PIPZMQ_OT_pip_pyzmq(bpy.types.Operator):
+    """Enables and updates pip, and installs pyzmq"""  # Use this as a tooltip for menu items and buttons.
+    # bl_idname = "object.move_x"  # Unique identifier for buttons and menu items to reference.
+    bl_idname = "pipzmq.pip_pyzmq"
+    bl_label = "Enable pip & install pyzmq"  # Display name in the interface.
+    bl_options = {'REGISTER'}  # Enable undo for the operator.
+    # statetest = "Nothing yet..."
+
+    def execute(self, context):  # execute() is called when running the operator.
+        install_props = context.window_manager.install_props
+        install_props.install_status = "Preparing to enable pip..."
+
+        # OS independent (Windows: bin\python.exe; Linux: bin/python3.7m)
+        py_path = Path(sys.prefix) / "bin"
+        py_exec = str(next(py_path.glob("python*")))  # first file that starts with "python" in "bin" dir
+        # TODO check permission rights
+        if subprocess.call([py_exec, "-m", "ensurepip"]) != 0:
+            print("Couldn't activate pip.")
+            install_props.install_status += "\nCouldn't activate pip."
+            self.report({'ERROR'}, "Couldn't activate pip.")
+            return {'CANCELLED'}
+        install_props.install_status += "\nPip activated! Updating pip..."
+        self.report({'INFO'}, "Pip activated! Updating pip...")
+        if subprocess.call([py_exec, "-m", "pip", "install", "--upgrade", "pip"]) != 0:
+            print("Couldn't update pip.")
+            install_props.install_status += "\nCouldn't update pip."
+            self.report({'ERROR'}, "Couldn't update pip.")
+            return {'CANCELLED'}
+        print("pip successfully activated & installed!")
+        install_props.install_status += "\nPip updated! Installing pyzmq..."
+        self.report({'INFO'}, "Pip updated! Installing pyzmq...")
+
+        if subprocess.call([py_exec, "-m", "pip", "install", "pyzmq"]) != 0:
+            print("Couldn't install pyzmq.")
+            install_props.install_status += "\nCouldn't install pyzmq."
+            self.report({'ERROR'}, "Couldn't install pyzmq.")
+            return {'CANCELLED'}
+        print("pyzmq successfully installed!")
+        install_props.install_status += "\npyzmq installed! READY!"
+        self.report({'INFO'}, "pyzmq installed! READY!")
+
+        return {'FINISHED'}  # Lets Blender know the operator finished successfully
+
+
 def register():
+    bpy.utils.register_class(PIPZMQ_OT_pip_pyzmq)
     bpy.utils.register_class(SOCKET_OT_connect_subscriber)
 
 
 def unregister():
     bpy.utils.unregister_class(SOCKET_OT_connect_subscriber)
+    bpy.utils.register_class(PIPZMQ_OT_pip_pyzmq)
 
 
 #

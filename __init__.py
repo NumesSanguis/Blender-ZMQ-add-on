@@ -81,14 +81,14 @@ from bpy.props import (
 # print("hello")
 # classes_register = []
 # from . blendzmq_props import TracerProperties
-from . blendzmq_props import ZMQSocketProperties
+from . blendzmq_props import PIPZMQProperties, ZMQSocketProperties
 from . blendzmq_panel import BLENDZMQ_PT_zmqConnector
 # classes_register.append(BLENDZMQ_PT_zmqConnector)
 
 # classes_operators = SOCKET_OT_connect_subscriber
 from . blendzmq_ops import (
     SOCKET_OT_connect_subscriber,
-    # OBJECT_OT_reload_module,
+    PIPZMQ_OT_pip_pyzmq,
 )
 
 
@@ -120,9 +120,10 @@ class blendzmq_preferences(AddonPreferences):
 
 # Define Classes to register
 classes = (
-    #TracerProperties,
+    PIPZMQProperties,
     ZMQSocketProperties,
     BLENDZMQ_PT_zmqConnector,
+    PIPZMQ_OT_pip_pyzmq,
     SOCKET_OT_connect_subscriber,
     blendzmq_preferences,
     )
@@ -141,7 +142,7 @@ def register():
     #     import importlib
     #     importlib.reload(blendzmq_props)
     #     importlib.reload(blendzmq_panel)
-    #     importlib.reload(blendzmq)
+    #     importlib.reload(blendzmq_ops)
     # except:
     #     pass
     # print("nothing4")
@@ -149,6 +150,7 @@ def register():
     for cls in classes:
         bpy.utils.register_class(cls)
     # bpy.types.WindowManager.curve_tracer = PointerProperty(type=TracerProperties)
+    bpy.types.WindowManager.install_props = PointerProperty(type=PIPZMQProperties)
     bpy.types.WindowManager.socket_settings = PointerProperty(type=ZMQSocketProperties)
 
 def unregister():
@@ -156,6 +158,7 @@ def unregister():
         bpy.utils.unregister_class(cls)
     # del bpy.types.WindowManager.curve_tracer
     del bpy.types.WindowManager.socket_settings
+    del bpy.types.WindowManager.install_props
 
 
 if __name__ == "__main__":

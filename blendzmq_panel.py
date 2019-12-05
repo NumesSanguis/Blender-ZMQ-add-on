@@ -40,19 +40,30 @@ class BLENDZMQ_PT_zmqConnector(Panel):
         # switch_expand = addon_prefs.expand_enum
         # obj = context.object
 
-        row = layout.row()
-        # layout.prop(socket_settings, "reload_module_name")
-        # layout.operator("object.reload_module")
-        # layout.operator("bpy.ops.script.reload()")
-        row.prop(socket_settings, "socket_ip")
-        row.prop(socket_settings, "socket_port", text="port")
-        layout.prop(socket_settings, "dynamic_object")
-        # if our socket hasn't connected yet
-        if not socket_settings.socket_connected:
-            layout.operator("socket.connect_subscriber")  # , text="Connect Socket"
-        else:
-            layout.operator("socket.connect_subscriber", text="Disconnect Socket")
-            layout.prop(socket_settings, "msg_received")
+        try:
+            import zmq
+
+            row = layout.row()
+            # layout.prop(socket_settings, "reload_module_name")
+            # layout.operator("object.reload_module")
+            # layout.operator("bpy.ops.script.reload()")
+            row.prop(socket_settings, "socket_ip")
+            row.prop(socket_settings, "socket_port", text="port")
+            layout.prop(socket_settings, "dynamic_object")
+            # if our socket hasn't connected yet
+            if not socket_settings.socket_connected:
+                layout.operator("socket.connect_subscriber")  # , text="Connect Socket"
+            else:
+                layout.operator("socket.connect_subscriber", text="Disconnect Socket")
+                layout.prop(socket_settings, "msg_received")
+
+        except ImportError:
+            install_props = context.window_manager.install_props
+
+            # button: enable pip and install pyzmq if not available
+            print("pyzmq not installed")
+            layout.operator("pipzmq.pip_pyzmq")
+            layout.prop(install_props, "install_status")
 
 
 def register():

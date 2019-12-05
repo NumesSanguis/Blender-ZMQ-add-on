@@ -60,12 +60,23 @@ class ZMQSocketProperties(PropertyGroup):
     #                                    )
 
 
+class PIPZMQProperties(PropertyGroup):
+    """pip install and pyzmq install Properties"""
+    install_status: StringProperty(name="Install status",
+                                   description="Install status messages",
+                                   default="pyzmq not found in Python distribution",
+                                   options={'PROPORTIONAL'}
+                                   )
+
+
 def register():
+    bpy.utils.register_class(PIPZMQProperties)
     bpy.utils.register_class(ZMQSocketProperties)
 
 
 def unregister():
     bpy.utils.unregister_class(ZMQSocketProperties)
+    bpy.utils.register_class(PIPZMQProperties)
 
 
 #
