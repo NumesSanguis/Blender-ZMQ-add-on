@@ -106,9 +106,9 @@ class SOCKET_OT_connect_subscriber(bpy.types.Operator):
         # self.blend_ctx = context
         #print(dir(self.blend_ctx))
         self.socket_settings = context.window_manager.socket_settings
-        self.track_selection = context.window_manager.track_selection
-        print("track_selection")
-        print(self.track_selection.multiple_objects)
+        # self.track_selection = context.window_manager.track_selection
+        # print("track_selection")
+        # print(self.track_selection.multiple_objects)
 
         if not self.socket_settings.socket_connected:
             self.zmq_ctx = zmq.Context().instance()  # zmq.Context().instance()  # Context
@@ -131,9 +131,9 @@ class SOCKET_OT_connect_subscriber(bpy.types.Operator):
 
             # self.socket_settings.selected_objects = bpy.context.scene.view_layers[0].objects.selected
             # self.selected_obj = bpy.context.scene.view_layers[0].objects.active
+            self.selected_objs = bpy.context.scene.view_layers[0].objects.selected.items().copy()  # .active
             # self.selected_objs = bpy.context.scene.view_layers[0].objects.selected  # .active
-            # self.selected_objs = bpy.context.scene.view_layers[0].selected_objects
-            self.track_selection.multiple_objects = bpy.context.scene.view_layers[0].objects.selected
+            # self.track_selection.multiple_objects = bpy.context.scene.view_layers[0].objects.selected
 
             bpy.app.timers.register(self.timed_msg_poller)
             # bpy.app.timers.register(partial(self.timed_msg_poller, context))
@@ -187,10 +187,11 @@ class SOCKET_OT_connect_subscriber(bpy.types.Operator):
                     # print(bpy.context.scene.view_layers[0].objects.active)
                     # print(type(bpy.context.scene.view_layers[0].objects.active))
                     # self.selected_obj = bpy.context.scene.view_layers[0].objects.active
-                    self.track_selection.multiple_objects = bpy.context.scene.view_layers[0].objects.selected
+                    # self.track_selection.multiple_objects = bpy.context.scene.view_layers[0].objects.selected
                     # dict works with pointers, therefore "Dynamic object" selection doesn't keep the old reference
                     # self.selected_objs = deepcopy(bpy.context.scene.view_layers[0].objects.selected)  # .active
                     # self.selected_objs = bpy.context.scene.view_layers[0].selected_objects
+                    self.selected_objs = bpy.context.scene.view_layers[0].objects.selected.items().copy()
 
                 # move all objects
                 # for obj in self.blend_ctx.scene.objects:
@@ -198,10 +199,11 @@ class SOCKET_OT_connect_subscriber(bpy.types.Operator):
                 #   move active object
                 move_val = int(msg.decode('utf-8')) * .1
                 # collections work with pointers, therefore "Dynamic object" selection doesn't keep the old reference
-                # for obj in self.selected_objs:
-                print(self.track_selection.multiple_objects)
-                for obj in self.track_selection.multiple_objects:
-                    obj.location.x = move_val
+                for obj in self.selected_objs:
+                # print(self.track_selection.multiple_objects)
+                # for obj in self.track_selection.multiple_objects:
+                    print(obj)
+                    obj[1].location.x = move_val
                 # self.selected_obj.location.x = int(msg.decode('utf-8')) * .1
 
             # keep running
