@@ -23,6 +23,7 @@ import bpy
 import sys
 import subprocess
 from pathlib import Path  # Object-oriented filesystem paths since Python 3.4
+from copy import deepcopy
 # import zmq
 import functools
 # import selection_utils
@@ -105,6 +106,9 @@ class SOCKET_OT_connect_subscriber(bpy.types.Operator):
         # self.blend_ctx = context
         #print(dir(self.blend_ctx))
         self.socket_settings = context.window_manager.socket_settings
+        self.track_selection = context.window_manager.track_selection
+        print("track_selection")
+        print(self.track_selection.multiple_objects)
 
         if not self.socket_settings.socket_connected:
             self.zmq_ctx = zmq.Context().instance()  # zmq.Context().instance()  # Context
@@ -122,7 +126,14 @@ class SOCKET_OT_connect_subscriber(bpy.types.Operator):
             self.socket_settings.socket_connected = True
 
             # reference to active object at start of data stream
-            self.selected_obj = bpy.context.scene.view_layers[0].objects.active
+            print(bpy.context.scene.view_layers[0].objects.selected)
+            print(type(bpy.context.scene.view_layers[0].objects.selected))
+
+            # self.socket_settings.selected_objects = bpy.context.scene.view_layers[0].objects.selected
+            # self.selected_obj = bpy.context.scene.view_layers[0].objects.active
+            # self.selected_objs = bpy.context.scene.view_layers[0].objects.selected  # .active
+            # self.selected_objs = bpy.context.scene.view_layers[0].selected_objects
+            self.track_selection.multiple_objects = bpy.context.scene.view_layers[0].objects.selected
 
             bpy.app.timers.register(self.timed_msg_poller)
             # bpy.app.timers.register(partial(self.timed_msg_poller, context))
@@ -150,6 +161,11 @@ class SOCKET_OT_connect_subscriber(bpy.types.Operator):
 
     def timed_msg_poller(self):  # context
         socket_sub = bpy.types.WindowManager.socket_sub
+        # track_selection = bpy.types.WindowManager.track_selection
+        # print("track_selection")
+        # print(track_selection.multiple_objects)
+
+        # socket_settings = bpy.types.WindowManager.socket_settings
         # only keep running if socket reference exist (not None)
         if socket_sub:
             # get sockets with messages (0: don't wait for msgs)
@@ -164,16 +180,29 @@ class SOCKET_OT_connect_subscriber(bpy.types.Operator):
 
                 # update selected obj as long as Dynamic object is on
                 if self.socket_settings.dynamic_object:
-                    self.selected_obj = bpy.context.scene.view_layers[0].objects.active
+                    print("\nobj selection info:")
+                    # self.socket_settings.selected_objects = bpy.context.scene.view_layers[0].objects.selected
+                    print(bpy.context.scene.view_layers[0].objects.selected)
+                    print(type(bpy.context.scene.view_layers[0].objects.selected))
+                    # print(bpy.context.scene.view_layers[0].objects.active)
+                    # print(type(bpy.context.scene.view_layers[0].objects.active))
+                    # self.selected_obj = bpy.context.scene.view_layers[0].objects.active
+                    self.track_selection.multiple_objects = bpy.context.scene.view_layers[0].objects.selected
+                    # dict works with pointers, therefore "Dynamic object" selection doesn't keep the old reference
+                    # self.selected_objs = deepcopy(bpy.context.scene.view_layers[0].objects.selected)  # .active
+                    # self.selected_objs = bpy.context.scene.view_layers[0].selected_objects
 
-                # move cube
+                # move all objects
                 # for obj in self.blend_ctx.scene.objects:
                 #     obj.location.x = int(msg.decode('utf-8')) * .1
-                # move object
-                self.selected_obj.location.x = int(msg.decode('utf-8')) * .1
-
-                # move only selected object
-                # self.blend_ctx.selected_objects.location.x = int(msg.decode('utf-8')) * .1
+                #   move active object
+                move_val = int(msg.decode('utf-8')) * .1
+                # collections work with pointers, therefore "Dynamic object" selection doesn't keep the old reference
+                # for obj in self.selected_objs:
+                print(self.track_selection.multiple_objects)
+                for obj in self.track_selection.multiple_objects:
+                    obj.location.x = move_val
+                # self.selected_obj.location.x = int(msg.decode('utf-8')) * .1
 
             # keep running
             return 0.001
@@ -280,27 +309,22 @@ class PIPZMQ_OT_pip_pyzmq(bpy.types.Operator):
         py_exec = str(next(py_path.glob("python*")))  # first file that starts with "python" in "bin" dir
         # TODO check permission rights
         if subprocess.call([py_exec, "-m", "ensurepip"]) != 0:
-            print("Couldn't activate pip.")
             install_props.install_status += "\nCouldn't activate pip."
             self.report({'ERROR'}, "Couldn't activate pip.")
             return {'CANCELLED'}
         install_props.install_status += "\nPip activated! Updating pip..."
         self.report({'INFO'}, "Pip activated! Updating pip...")
         if subprocess.call([py_exec, "-m", "pip", "install", "--upgrade", "pip"]) != 0:
-            print("Couldn't update pip.")
             install_props.install_status += "\nCouldn't update pip."
             self.report({'ERROR'}, "Couldn't update pip.")
             return {'CANCELLED'}
-        print("pip successfully activated & installed!")
         install_props.install_status += "\nPip updated! Installing pyzmq..."
         self.report({'INFO'}, "Pip updated! Installing pyzmq...")
 
         if subprocess.call([py_exec, "-m", "pip", "install", "pyzmq"]) != 0:
-            print("Couldn't install pyzmq.")
             install_props.install_status += "\nCouldn't install pyzmq."
             self.report({'ERROR'}, "Couldn't install pyzmq.")
             return {'CANCELLED'}
-        print("pyzmq successfully installed!")
         install_props.install_status += "\npyzmq installed! READY!"
         self.report({'INFO'}, "pyzmq installed! READY!")
 

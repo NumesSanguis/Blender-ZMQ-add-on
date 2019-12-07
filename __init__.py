@@ -81,7 +81,7 @@ from bpy.props import (
 # print("hello")
 # classes_register = []
 # from . blendzmq_props import TracerProperties
-from . blendzmq_props import PIPZMQProperties, ZMQSocketProperties
+from . blendzmq_props import PIPZMQProperties, ZMQSocketProperties, MyCollections, TrackSelectionProperties  # MyPropertyGroup
 from . blendzmq_panel import BLENDZMQ_PT_zmqConnector
 # classes_register.append(BLENDZMQ_PT_zmqConnector)
 
@@ -122,6 +122,9 @@ class blendzmq_preferences(AddonPreferences):
 classes = (
     PIPZMQProperties,
     ZMQSocketProperties,
+    MyCollections,
+    TrackSelectionProperties,
+    # MyPropertyGroup,
     BLENDZMQ_PT_zmqConnector,
     PIPZMQ_OT_pip_pyzmq,
     SOCKET_OT_connect_subscriber,
@@ -152,11 +155,13 @@ def register():
     # bpy.types.WindowManager.curve_tracer = PointerProperty(type=TracerProperties)
     bpy.types.WindowManager.install_props = PointerProperty(type=PIPZMQProperties)
     bpy.types.WindowManager.socket_settings = PointerProperty(type=ZMQSocketProperties)
+    bpy.types.WindowManager.track_selection = PointerProperty(type=TrackSelectionProperties)  #  MyPropertyGroup
 
 def unregister():
     for cls in classes:
         bpy.utils.unregister_class(cls)
     # del bpy.types.WindowManager.curve_tracer
+    del bpy.types.WindowManager.track_selection
     del bpy.types.WindowManager.socket_settings
     del bpy.types.WindowManager.install_props
 

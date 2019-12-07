@@ -29,6 +29,8 @@ from bpy.props import (
         IntProperty,
         BoolProperty,
         FloatVectorProperty,
+        PointerProperty,
+        CollectionProperty,
         )
 
 
@@ -58,6 +60,9 @@ class ZMQSocketProperties(PropertyGroup):
     #                                    description="Reload this module",
     #                                    default="blendzmq",
     #                                    )
+    # selected_objects: CollectionProperty(type=bpy.types.Object)
+    # selected_objects: PointerProperty(type=bpy.types.Object)
+    # multiple_objects: bpy.props.CollectionProperty(type=bpy.types.Object)
 
 
 class PIPZMQProperties(PropertyGroup):
@@ -69,14 +74,32 @@ class PIPZMQProperties(PropertyGroup):
                                    )
 
 
+class MyCollections(bpy.types.PropertyGroup):
+    object: bpy.props.PointerProperty(type=bpy.types.Object)
+
+
+# class MyPropertyGroup(bpy.types.PropertyGroup):
+#     my_objects: bpy.props.CollectionProperty(type=MyCollections)
+
+
+class TrackSelectionProperties(bpy.types.PropertyGroup):
+    multiple_objects: bpy.props.CollectionProperty(type=MyCollections)  # bpy.types.Object
+
+
 def register():
     bpy.utils.register_class(PIPZMQProperties)
     bpy.utils.register_class(ZMQSocketProperties)
+    bpy.utils.register_class(MyCollections)
+    # bpy.utils.register_class(MyPropertyGroup)
+    bpy.utils.unregister_class(TrackSelectionProperties)
 
 
 def unregister():
+    bpy.utils.unregister_class(TrackSelectionProperties)
+    # bpy.utils.register_class(MyPropertyGroup)
+    bpy.utils.register_class(MyCollections)
     bpy.utils.unregister_class(ZMQSocketProperties)
-    bpy.utils.register_class(PIPZMQProperties)
+    bpy.utils.unregister_class(PIPZMQProperties)
 
 
 #

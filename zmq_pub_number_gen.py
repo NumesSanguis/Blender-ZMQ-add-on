@@ -24,10 +24,10 @@ def main(ip="127.0.0.1"):
         # publish data
         socket.send_multipart([topic, msg])  # 'test'.format(i)
         print("On topic {}, send data: {}".format(topic, msg))
-        # 60 fps
-        time.sleep(1/60)
+        # 30 fps
+        time.sleep(1/30)
 
-        i += 1
+        i += 2
         if i > 100:
             i = 0
 
