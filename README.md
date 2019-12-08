@@ -1,4 +1,4 @@
-# Blender-ZMQ-add-on
+# Blender-ZMQ-add-on (BlendZMQ)
 Blender 2.8x add-on that allows streaming of data (from another computer) into Blender over ZeroMQ sockets,
 **without** freezing the interface (publisher-subscriber pattern).
 
@@ -68,6 +68,8 @@ https://docs.blender.org/api/current/info_tips_and_tricks.html#bundled-python-ex
 
 
 # Notes
+- blenderartist: https://blenderartists.org/t/blendzmq-open-source-add-on-streaming-data-into-blender-2-8x-without-freezing-the-interface/
+- Gumroad: https://gumroad.com/l/blendzmq
 - Blender add-on file structure inspired by btrace: https://github.com/sobotka/blender-addons/tree/master/btrace
 - More information about ZeroMQ: https://zeromq.org/
 - Why not make your outside Blender software easy to deploy, independent of OS?
