@@ -20,7 +20,7 @@ a message from outside (using `zmq.Poller()`). If so, process that data to move 
 This timer keeps being invoked until the socket has been disconnected.
 See for a demonstration:
 
-TODO: YOUTUBE link
+[![BlendZMQ demo](https://img.youtube.com/vi/68zSpWZirtI/0.jpg)](https://youtu.be/68zSpWZirtI)]
 
 You can take this add-on as an example on how to connect your own programs with Blender.
 
@@ -73,3 +73,9 @@ https://docs.blender.org/api/current/info_tips_and_tricks.html#bundled-python-ex
 - Why not make your outside Blender software easy to deploy, independent of OS?
 Take a look at ZeroMQ with Docker: https://github.com/NumesSanguis/pyzmq-docker
 - When developing Blender Add-ons, reload all add-ons without restarting Blender by executing: `bpy.ops.script.reload()`
+
+
+# Acknowledgement
+- dr.sybren (bunch of small questions)
+- joules (multi-selection of previously selected objects)
+- Other people at blender.chat, blender.stackexchange.com and the documentation
