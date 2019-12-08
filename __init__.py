@@ -16,48 +16,24 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-# Copyright (c) Stef van der Struijk
+# Copyright (c) Stef van der Struijk <stefstruijk@protonmail.ch>
 
 
 bl_info = {
     "name": "blendzmq",
     "author": "Stef van der Struijk",
-    "version": (0, 1),
-    "blender": (2, 80, 0),
+    "version": (1, 0),
+    "blender": (2, 80, 0),  # also tested with 2.81
     "location": "View3D > Sidebar > Create Tab",
     "description": "Connects Blender with outside programs through ZeroMQ without freezing the interface",
     "warning": "",
     "wiki_url": "https://github.com/NumesSanguis/Blender-ZMQ-add-on",
     "category": "Development"}
 
-#--------------------------
-# import exporter modules
-#--------------------------
-# if "bpy" in locals():
-#     import importlib as imp
-#     if "blendzmq_props" in locals:
-#         imp.reload(blendzmq_props)
-#     if "blendzmq_panel" in locals:
-#         imp.reload(blendzmq_panel)
-#     if "blendzmq" in locals:
-#         imp.reload(blendzmq)
-#     # if "ot" in locals:
-#     #     imp.reload(ot)
-# else:
-#     #
-#     import bpy
-#     from . import prop
-#     from . import io
-#     from . import ui
-#     from . import ot
-
+# add-on is being reloaded
 if "bpy" in locals():
     print("reloading .py files")
     import importlib
-    # from . blendzmq_props import ZMQSocketProperties
-    # importlib.reload(ZMQSocketProperties)
-    # from . blendzmq_panel import BLENDZMQ_PT_zmqConnector
-    # importlib.reload(BLENDZMQ_PT_zmqConnector)
 
     from . import blendzmq_props
     importlib.reload(blendzmq_props)
@@ -65,7 +41,7 @@ if "bpy" in locals():
     importlib.reload(blendzmq_panel)
     from . import blendzmq_ops
     importlib.reload(blendzmq_ops)
-    # importlib.reload(ZMQSocketProperties)
+# first time loading add-on
 else:
     print("importing .py files")
     import bpy
@@ -75,93 +51,64 @@ else:
 
 from bpy.types import AddonPreferences
 from bpy.props import (
-    EnumProperty,
     PointerProperty,
+    StringProperty,
 )
-# print("hello")
-# classes_register = []
-# from . blendzmq_props import TracerProperties
-from . blendzmq_props import PIPZMQProperties, ZMQSocketProperties  # , MyCollections, TrackSelectionProperties  # MyPropertyGroup
+from . blendzmq_props import PIPZMQProperties, ZMQSocketProperties
 from . blendzmq_panel import BLENDZMQ_PT_zmqConnector
-# classes_register.append(BLENDZMQ_PT_zmqConnector)
-
-# classes_operators = SOCKET_OT_connect_subscriber
-from . blendzmq_ops import (
-    SOCKET_OT_connect_subscriber,
-    PIPZMQ_OT_pip_pyzmq,
-)
+from . blendzmq_ops import SOCKET_OT_connect_subscriber, PIPZMQ_OT_pip_pyzmq
 
 
 # Add-on Preferences
-class blendzmq_preferences(AddonPreferences):
-    bl_idname = "blendzmq"
+class BlendzmqPreferences(AddonPreferences):
+    """Remember ip and port number as addon preference (across Blender sessions)
 
-    expand_enum: EnumProperty(
-            name="UI Options",
-            items=[
-                 ('list', "Drop down list",
-                  "Show all the items as dropdown list in the Tools Region"),
-                 ('col', "Enable Expanded UI Panel",
-                  "Show all the items expanded in the Tools Region in a column"),
-                 ('row', "Icons only in a row",
-                  "Show all the items as icons expanded in a row in the Tools Region")
-                  ],
-            description="",
-            default='list'
-            )
+    Editable in UI interface, or `Edit -> Preferences... -> Add-ons -> Development: blendzmq -> Preferences`"""
+
+    bl_idname = __name__
+
+    socket_ip: StringProperty(name="Socket ip",
+                              description="IP of ZMQ publisher socket",
+                              default="127.0.0.1",
+                              )
+    socket_port: StringProperty(name="Socket port",
+                                description="Port of ZMQ publisher socket",
+                                default="5550",
+                                )
 
     def draw(self, context):
         layout = self.layout
-        layout.label(text="UI Options:")
+        layout.label(text="Socket connection settings:")
 
         row = layout.row(align=True)
-        row.prop(self, "expand_enum", text="UI Options", expand=True)
+        row.prop(self, "socket_ip", text="ip")
+        row.prop(self, "socket_port", text="port")
 
 
 # Define Classes to register
 classes = (
     PIPZMQProperties,
     ZMQSocketProperties,
-    # MyCollections,
-    # TrackSelectionProperties,
-    # MyPropertyGroup,
-    BLENDZMQ_PT_zmqConnector,
     PIPZMQ_OT_pip_pyzmq,
     SOCKET_OT_connect_subscriber,
-    blendzmq_preferences,
+    BlendzmqPreferences,
+    BLENDZMQ_PT_zmqConnector,
     )
 
-# register, unregister = bpy.utils.register_classes_factory(classes)
-def register():
-    # development purposes to prevent "already registered error"
-    # try:
-    #     unregister()
-    # except:
-    #     pass
-    #
-    # # development purposes to prevent not detecting changes
-    # try:
-    #     print("reloading .py files")
-    #     import importlib
-    #     importlib.reload(blendzmq_props)
-    #     importlib.reload(blendzmq_panel)
-    #     importlib.reload(blendzmq_ops)
-    # except:
-    #     pass
-    # print("nothing4")
 
+# one-liner to (un)register if no property registration was needed
+# register, unregister = bpy.utils.register_classes_factory(classes)
+
+def register():
     for cls in classes:
         bpy.utils.register_class(cls)
-    # bpy.types.WindowManager.curve_tracer = PointerProperty(type=TracerProperties)
     bpy.types.WindowManager.install_props = PointerProperty(type=PIPZMQProperties)
     bpy.types.WindowManager.socket_settings = PointerProperty(type=ZMQSocketProperties)
-    # bpy.types.WindowManager.track_selection = PointerProperty(type=TrackSelectionProperties)  #  MyPropertyGroup
+
 
 def unregister():
-    for cls in classes:
+    for cls in reversed(classes):
         bpy.utils.unregister_class(cls)
-    # del bpy.types.WindowManager.curve_tracer
-    # del bpy.types.WindowManager.track_selection
     del bpy.types.WindowManager.socket_settings
     del bpy.types.WindowManager.install_props
 

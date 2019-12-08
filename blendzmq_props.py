@@ -16,7 +16,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-# Copyright (c) Stef van der Struijk
+# Copyright (c) Stef van der Struijk <stefstruijk@protonmail.ch>
 
 import bpy
 from bpy.types import (
@@ -24,26 +24,23 @@ from bpy.types import (
         )
 from bpy.props import (
         StringProperty,
-        FloatProperty,
-        EnumProperty,
-        IntProperty,
         BoolProperty,
-        FloatVectorProperty,
-        PointerProperty,
-        CollectionProperty,
         )
 
 
 class ZMQSocketProperties(PropertyGroup):
     """ZeroMQ socket Properties"""
-    socket_ip: StringProperty(name="Socket ip",
-                              description="IP of ZMQ publisher socket",
-                              default="127.0.0.1",
-                              )
-    socket_port: StringProperty(name="Socket port",
-                                description="Port of ZMQ publisher socket",
-                                default="5550",
-                                )
+
+    #   moved to __init__.py -> BlendzmqPreferences()
+    # socket_ip: StringProperty(name="Socket ip",
+    #                           description="IP of ZMQ publisher socket",
+    #                           default="127.0.0.1",
+    #                           )
+    # socket_port: StringProperty(name="Socket port",
+    #                             description="Port of ZMQ publisher socket",
+    #                             default="5550",
+    #                             )
+
     socket_connected: BoolProperty(name="Connect status",
                                    description="Boolean whether the Socket's connection is active or not",
                                    default=False
@@ -52,17 +49,11 @@ class ZMQSocketProperties(PropertyGroup):
                                  description="Message received from ZMQ subscriber socket",
                                  default="Awaiting msg...",
                                  )
-    dynamic_object: BoolProperty(name="Dynamic object",
-                                 description="Stream data to selected object (False: stream to same object)",
+    dynamic_object: BoolProperty(name="Dynamic objects",
+                                 description="Stream data to selected objects (False: stream to same objects)",
                                  default=True
                                  )
-    # reload_module_name: StringProperty(name="Name",
-    #                                    description="Reload this module",
-    #                                    default="blendzmq",
-    #                                    )
     # selected_objects: CollectionProperty(type=bpy.types.Object)
-    # selected_objects: PointerProperty(type=bpy.types.Object)
-    # multiple_objects: bpy.props.CollectionProperty(type=bpy.types.Object)
 
 
 class PIPZMQProperties(PropertyGroup):
@@ -70,38 +61,25 @@ class PIPZMQProperties(PropertyGroup):
     install_status: StringProperty(name="Install status",
                                    description="Install status messages",
                                    default="pyzmq not found in Python distribution",
-                                   options={'PROPORTIONAL'}
                                    )
 
 
+# failed attempt at storing reference to selected objects
 # class MyCollections(bpy.types.PropertyGroup):
 #     object: bpy.props.PointerProperty(type=bpy.types.Object)
-#
-#
-# # class MyPropertyGroup(bpy.types.PropertyGroup):
-# #     my_objects: bpy.props.CollectionProperty(type=MyCollections)
-#
-#
 # class TrackSelectionProperties(bpy.types.PropertyGroup):
-#     multiple_objects: bpy.props.CollectionProperty(type=MyCollections)  # bpy.types.Object
+#     selected_objects: bpy.props.CollectionProperty(type=MyCollections)  # bpy.types.Object
 
 
 def register():
     bpy.utils.register_class(PIPZMQProperties)
     bpy.utils.register_class(ZMQSocketProperties)
-    # bpy.utils.register_class(MyCollections)
-    # bpy.utils.register_class(MyPropertyGroup)
-    # bpy.utils.unregister_class(TrackSelectionProperties)
 
 
 def unregister():
-    # bpy.utils.unregister_class(TrackSelectionProperties)
-    # bpy.utils.register_class(MyPropertyGroup)
-    # bpy.utils.register_class(MyCollections)
     bpy.utils.unregister_class(ZMQSocketProperties)
     bpy.utils.unregister_class(PIPZMQProperties)
 
 
-#
 if __name__ == "__main__":
     register()

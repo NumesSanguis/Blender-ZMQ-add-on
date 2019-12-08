@@ -16,7 +16,7 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-# Copyright (c) Stef van der Struijk
+# Copyright (c) Stef van der Struijk <stefstruijk@protonmail.ch>
 
 import bpy
 from bpy.types import Panel
@@ -24,31 +24,36 @@ from bpy.types import Panel
 
 # Draw Socket panel in Toolbar
 class BLENDZMQ_PT_zmqConnector(Panel):
-    # bl_idname = "BLENDZMQ_PT_object_brush" # "BTRACE_PT_object_brush"
+    """Interface to set and (dis)connect the ZeroMQ socket; Found in side panel of the 3D view
+     (open by pressing `n` or dragging `<`)"""
+
     bl_label = "BlenderZMQ"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     bl_context = "objectmode"
     bl_category = "bZMQ"
-    bl_options = {'DEFAULT_CLOSED'}
+    # bl_options = {'DEFAULT_CLOSED'}
 
     def draw(self, context):
         layout = self.layout
+        preferences = context.preferences.addons[__package__].preferences
         socket_settings = context.window_manager.socket_settings
-        # Btrace = context.window_manager.curve_tracer
-        # addon_prefs = context.preferences.addons[__package__].preferences
-        # switch_expand = addon_prefs.expand_enum
-        # obj = context.object
 
+        #   check if pyzmq is installed; will fail with an ImportError if not
+        # if installed, will show interaction options: (dis)connect socket and whether to use dynamic object selection
         try:
             import zmq
 
+            # connection information
             row = layout.row()
-            # layout.prop(socket_settings, "reload_module_name")
-            # layout.operator("object.reload_module")
-            # layout.operator("bpy.ops.script.reload()")
-            row.prop(socket_settings, "socket_ip")
-            row.prop(socket_settings, "socket_port", text="port")
+            #   per Blender session ip and port number
+            # row.prop(socket_settings, "socket_ip", text="ip")
+            # row.prop(socket_settings, "socket_port", text="port")
+            #   Add-on preference based ip and port number
+            row.prop(preferences, "socket_ip", text="ip")
+            row.prop(preferences, "socket_port", text="port")
+
+            # whether if previous selection is remembered or always use current selected objects
             layout.prop(socket_settings, "dynamic_object")
             # if our socket hasn't connected yet
             if not socket_settings.socket_connected:
@@ -57,12 +62,14 @@ class BLENDZMQ_PT_zmqConnector(Panel):
                 layout.operator("socket.connect_subscriber", text="Disconnect Socket")
                 layout.prop(socket_settings, "msg_received")
 
+        # if not installed, show button that enables & updates pip, and pip installs pyzmq
         except ImportError:
+            # keep track of how our installation is going
             install_props = context.window_manager.install_props
 
             # button: enable pip and install pyzmq if not available
-            print("pyzmq not installed")
             layout.operator("pipzmq.pip_pyzmq")
+            # show status messages (kinda cramped)
             layout.prop(install_props, "install_status")
 
 
@@ -74,6 +81,5 @@ def unregister():
     bpy.utils.unregister_class(BLENDZMQ_PT_zmqConnector)
 
 
-#
 if __name__ == "__main__":
     register()
