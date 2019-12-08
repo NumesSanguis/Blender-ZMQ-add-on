@@ -28,37 +28,37 @@ You can take this add-on as an example on how to connect your own programs with 
 ## Prerequisite
 - Python (tested with 3.7, probably 2.7, 3.5+ works too) on your system with `pyzmq`
 for programs outside Blender.
-    - Anaconda (recommended to manage Python environments)
-        0. Anaconda 3.7+: https://www.anaconda.com/distribution/
-        0. `conda create --name bzmq python=3.7`  # create environment with Python 3.7
-        0. `conda activate bzmq`  # activate newly created environment
-        0. `conda install -c anaconda pyzmq`  # install pyzmq in this environment
-    - System Python: `pip install pyzmq`
+   - Anaconda (recommended to manage Python environments)
+      0. Anaconda 3.7+: https://www.anaconda.com/distribution/
+      0. `conda create --name bzmq python=3.7`  # create environment with Python 3.7
+      0. `conda activate bzmq`  # activate newly created environment
+      0. `conda install -c anaconda pyzmq`  # install pyzmq in this environment
+   - System Python: `pip install pyzmq`
 
 ## How to use
 0. Download this repository as a .zip by:
-    - Go to https://github.com/NumesSanguis/Blender-ZMQ-add-on/releases and download the ZIP, or
-    - Clicking the green "Clone or download" button and choose "Download ZIP"
+   - Go to https://github.com/NumesSanguis/Blender-ZMQ-add-on/releases and download the ZIP, or
+   - Clicking the green "Clone or download" button and choose "Download ZIP"
 0. Start Blender with Administrator right (at least on Windows) to allow enabling of `pip` and installing `pyzmq`
 (does NOT work with a Snap package install of Blender on Linux, see troubleshooting)
 0. In Blender, add this add-on by selecting Edit -> Preferences -> Add-ons ->
-    0. Install... -> select downloaded ZIP from step 1 -> Install Add-on
-    0. Search: `blendzmq` -> click checkbox to activate
+   0. Install... -> select downloaded ZIP from step 1 -> Install Add-on
+   0. Search: `blendzmq` -> click checkbox to activate
 0. Open side panel in 3D view by
-    - Pressing `n` on your keyboard
-    - Dragging `<` to the left
+   - Pressing `n` on your keyboard
+   - Dragging `<` to the left
 0. Click "bZMQ" -> "Enable pip & install pyzmq" button
 0. Click "Connect socket" button. Now it's waiting for data message from outside.
 0. Start outside script to send data into blender (Get the script by downloading from the GitHub repo / unzip previously downloaded ZIP):
-    0. Get script by:
-        0. Unziping the .zip downloaded in step 1
-        0. In terminal: `git clone https://github.com/NumesSanguis/Blender-ZMQ-add-on`
-    0. Open a terminal and navigate to `cd *path*/Blender-ZMQ-add-on`
-    0. Make sure conda / virtual env is active (e.g. `conda activate bzmq`) with `pyzmq`
-    0. Execute: `python zmq_pub_number_gen.py` (Change ip or port by adding `--ip 192.168.x.x` and/or `--port 8080`)
+   0. Get script by:
+      0. Unziping the .zip downloaded in step 1
+      0. In terminal: `git clone https://github.com/NumesSanguis/Blender-ZMQ-add-on`
+   0. Open a terminal and navigate to `cd *path*/Blender-ZMQ-add-on`
+   0. Make sure conda / virtual env is active (e.g. `conda activate bzmq`) with `pyzmq`
+   0. Execute: `python zmq_pub_number_gen.py` (Change ip or port by adding `--ip 192.168.x.x` and/or `--port 8080`)
 0. See objects moving!
-    - "Dynamic objects" can be selected to update location of current selected objects
-    - "Dynamic objects" can be deselected to keep updating only the objects that were active at deselection time.
+   - "Dynamic objects" can be selected to update location of current selected objects
+   - "Dynamic objects" can be deselected to keep updating only the objects that were active at deselection time.
     
     
 ## Troubleshooting
