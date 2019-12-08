@@ -42,8 +42,8 @@ for programs outside Blender.
 1. Start Blender with Administrator right (at least on Windows) to allow enabling of `pip` and installing `pyzmq`
 (does NOT work with a Snap package install of Blender on Linux, see troubleshooting)
 1. In Blender, add this add-on by selecting Edit -> Preferences -> Add-ons ->
-   a. Install... -> select downloaded ZIP from step 1 -> Install Add-on
-   a. Search: `blendzmq` -> click checkbox to activate
+   1. Install... -> select downloaded ZIP from step 1 -> Install Add-on
+   1. Search: `blendzmq` -> click checkbox to activate
 1. Open side panel in 3D view by
    - Pressing `n` on your keyboard
    - Dragging `<` to the left
