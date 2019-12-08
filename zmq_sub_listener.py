@@ -17,7 +17,7 @@ def main(ip="127.0.0.1", port="5550"):
     url = "tcp://{}:{}".format(ip, port)
     ctx = zmq.Context()
     socket = ctx.socket(zmq.SUB)
-    socket.connect(url)  # subscriber creates ZeroMQ socket
+    socket.bind(url)  # subscriber creates ZeroMQ socket
     socket.setsockopt(zmq.SUBSCRIBE, ''.encode('utf-8'))  # any topic
     print("Sub bound to: {}\nWaiting for data...".format(url))
 

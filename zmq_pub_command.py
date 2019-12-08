@@ -16,7 +16,7 @@ def main(ip="127.0.0.1", port="5550"):
     url = "tcp://{}:{}".format(ip, port)
     ctx = zmq.Context()
     socket = ctx.socket(zmq.PUB)
-    socket.bind(url)  # publisher connects to subscriber
+    socket.connect(url)  # publisher connects to subscriber
     print("Pub connected to: {}\nSending data...".format(url))
 
     i = 0
