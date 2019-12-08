@@ -1,6 +1,6 @@
 # Blender-ZMQ-add-on
 Blender 2.8x add-on that allows streaming of data (from another computer) into Blender over ZeroMQ sockets,
-**without** freezing the interface.
+**without** freezing the interface (publisher-subscriber pattern).
 
 ## Overview
 Blender is very powerful software, but if you run your own code that's a bit heavy, you quickly make the interface
@@ -16,8 +16,8 @@ between programs (even when written in different languages) by using sockets.
 Therefore, the data can be send over the network (e.g. TCP), meaning you can even run the software on different machines.
 
 This add-on works by setting a timer function (Blender 2.80+) that checks if a ZeroMQ socket has received
-a message from outside (using `zmq.Poller()`). If so, process that data to move a selected object.
-This timer keeps being triggered until the socket has been disconnected.
+a message from outside (using `zmq.Poller()`). If so, process that data to move selected objects.
+This timer keeps being invoked until the socket has been disconnected.
 See for a demonstration:
 
 TODO: YOUTUBE link
