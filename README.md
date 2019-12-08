@@ -68,7 +68,7 @@ https://docs.blender.org/api/current/info_tips_and_tricks.html#bundled-python-ex
 
 
 # Notes
-- blenderartist: https://blenderartists.org/t/blendzmq-open-source-add-on-streaming-data-into-blender-2-8x-without-freezing-the-interface/
+- Blender Artists: https://blenderartists.org/t/blendzmq-open-source-add-on-streaming-data-into-blender-2-8x-without-freezing-the-interface/
 - Gumroad: https://gumroad.com/l/blendzmq
 - Blender add-on file structure inspired by btrace: https://github.com/sobotka/blender-addons/tree/master/btrace
 - More information about ZeroMQ: https://zeromq.org/
