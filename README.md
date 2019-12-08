@@ -36,27 +36,27 @@ for programs outside Blender.
    - System Python: `pip install pyzmq`
 
 ## How to use
-0. Download this repository as a .zip by:
+1. Download this repository as a .zip by:
    - Go to https://github.com/NumesSanguis/Blender-ZMQ-add-on/releases and download the ZIP, or
    - Clicking the green "Clone or download" button and choose "Download ZIP"
-0. Start Blender with Administrator right (at least on Windows) to allow enabling of `pip` and installing `pyzmq`
+1. Start Blender with Administrator right (at least on Windows) to allow enabling of `pip` and installing `pyzmq`
 (does NOT work with a Snap package install of Blender on Linux, see troubleshooting)
-0. In Blender, add this add-on by selecting Edit -> Preferences -> Add-ons ->
+1. In Blender, add this add-on by selecting Edit -> Preferences -> Add-ons ->
    a. Install... -> select downloaded ZIP from step 1 -> Install Add-on
    a. Search: `blendzmq` -> click checkbox to activate
-0. Open side panel in 3D view by
+1. Open side panel in 3D view by
    - Pressing `n` on your keyboard
    - Dragging `<` to the left
-0. Click "bZMQ" -> "Enable pip & install pyzmq" button
-0. Click "Connect socket" button. Now it's waiting for data message from outside.
-0. Start outside script to send data into blender (Get the script by downloading from the GitHub repo / unzip previously downloaded ZIP):
+1. Click "bZMQ" -> "Enable pip & install pyzmq" button
+1. Click "Connect socket" button. Now it's waiting for data message from outside.
+1. Start outside script to send data into blender (Get the script by downloading from the GitHub repo / unzip previously downloaded ZIP):
    1. Get script by:
       * Unziping the .zip downloaded in step 1
       * In terminal: `git clone https://github.com/NumesSanguis/Blender-ZMQ-add-on`
    2. Open a terminal and navigate to `cd *path*/Blender-ZMQ-add-on`
    3. Make sure conda / virtual env is active (e.g. `conda activate bzmq`) with `pyzmq`
    4. Execute: `python zmq_pub_number_gen.py` (Change ip or port by adding `--ip 192.168.x.x` and/or `--port 8080`)
-0. See objects moving!
+1. See objects moving!
    - "Dynamic objects" can be selected to update location of current selected objects
    - "Dynamic objects" can be deselected to keep updating only the objects that were active at deselection time.
     
