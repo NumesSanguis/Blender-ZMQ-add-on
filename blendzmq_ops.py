@@ -145,24 +145,40 @@ class PIPZMQ_OT_pip_pyzmq(bpy.types.Operator):
 
     def execute(self, context):  # execute() is called when running the operator.
         install_props = context.window_manager.install_props
-        install_props.install_status = "Preparing to enable pip..."
 
-        # OS independent (Windows: bin\python.exe; Linux: bin/python3.7m)
-        py_path = Path(sys.prefix) / "bin"
-        py_exec = str(next(py_path.glob("python*")))  # first file that starts with "python" in "bin" dir
+        # pip in Blender:
+        # https://blender.stackexchange.com/questions/139718/install-pip-and-packages-from-within-blender-os-independently/
+
+        # no pip enabled by default version < 2.81
+        if bpy.app.version[0] == 2 and bpy.app.version[1] < 81:
+            install_props.install_status = "Preparing to enable pip..."
+            # find python binary OS independent (Windows: bin\python.exe; Linux: bin/python3.7m)
+            py_path = Path(sys.prefix) / "bin"
+            py_exec = str(next(py_path.glob("python*")))  # first file that starts with "python" in "bin" dir
+
+            if subprocess.call([py_exec, "-m", "ensurepip"]) != 0:
+                install_props.install_status += "\nCouldn't activate pip."
+                self.report({'ERROR'}, "Couldn't activate pip.")
+                return {'CANCELLED'}
+
+        # from 2.81 pip is enabled by default
+        else:
+            import ensurepip
+            ensurepip.bootstrap()
+            py_exec = bpy.app.binary_path_python
+
         # TODO check permission rights
-        if subprocess.call([py_exec, "-m", "ensurepip"]) != 0:
-            install_props.install_status += "\nCouldn't activate pip."
-            self.report({'ERROR'}, "Couldn't activate pip.")
-            return {'CANCELLED'}
+        # TODO Windows ask for permission:
+        #  https://stackoverflow.com/questions/130763/request-uac-elevation-from-within-a-python-script
+
         install_props.install_status += "\nPip activated! Updating pip..."
         self.report({'INFO'}, "Pip activated! Updating pip...")
         if subprocess.call([py_exec, "-m", "pip", "install", "--upgrade", "pip"]) != 0:
             install_props.install_status += "\nCouldn't update pip."
             self.report({'ERROR'}, "Couldn't update pip.")
             return {'CANCELLED'}
-        install_props.install_status += "\nPip updated! Installing pyzmq..."
-        self.report({'INFO'}, "Pip updated! Installing pyzmq...")
+        install_props.install_status += "\nPip working! Installing pyzmq..."
+        self.report({'INFO'}, "Pip working! Installing pyzmq...")
 
         if subprocess.call([py_exec, "-m", "pip", "install", "pyzmq"]) != 0:
             install_props.install_status += "\nCouldn't install pyzmq."
