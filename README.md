@@ -2,6 +2,12 @@
 Blender 2.8x add-on that allows streaming of data (from another computer) into Blender over ZeroMQ sockets,
 **without** freezing the interface (publisher-subscriber pattern).
 
+## Update
+- v1.1 (2020-02-10) - **Blender 2.81+ pip support**: In Blender 2.81 pip is enabled by default.
+This update takes that behavior into account. If the `Enable pip & install pyzmq` button fails, it still executes
+`ensurepip.bootstrap()`. Restart Blender and try again, it will work this time
+(on Windows make sure you run with admin rights).
+
 ## Overview
 Blender is very powerful software, but if you run your own code that's a bit heavy, you quickly make the interface
 unresponsive. I.e freezing the interface.

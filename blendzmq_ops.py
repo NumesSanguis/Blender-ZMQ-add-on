@@ -148,10 +148,12 @@ class PIPZMQ_OT_pip_pyzmq(bpy.types.Operator):
 
         # pip in Blender:
         # https://blender.stackexchange.com/questions/139718/install-pip-and-packages-from-within-blender-os-independently/
+        # pip 2.81 issues: https://developer.blender.org/T71856
 
         # no pip enabled by default version < 2.81
+        install_props.install_status = "Preparing to enable pip..."
+        self.report({'INFO'}, "Preparing to enable pip...")
         if bpy.app.version[0] == 2 and bpy.app.version[1] < 81:
-            install_props.install_status = "Preparing to enable pip..."
             # find python binary OS independent (Windows: bin\python.exe; Linux: bin/python3.7m)
             py_path = Path(sys.prefix) / "bin"
             py_exec = str(next(py_path.glob("python*")))  # first file that starts with "python" in "bin" dir
@@ -163,8 +165,22 @@ class PIPZMQ_OT_pip_pyzmq(bpy.types.Operator):
 
         # from 2.81 pip is enabled by default
         else:
-            import ensurepip
-            ensurepip.bootstrap()
+            try:
+                # will likely fail the first time, but works after `ensurepip.bootstrap()` has been called once
+                import pip
+            except ModuleNotFoundError as e:
+                # only first attempt will reach here
+                print("Pip import failed with: ", e)
+                install_props.install_status += "\nPip not activated, trying bootstrap()"
+                self.report({'ERROR'}, "Pip not activated, trying bootstrap()")
+                try:
+                    import ensurepip
+                    ensurepip.bootstrap()
+                except:  # catch *all* exceptions
+                    e = sys.exc_info()[0]
+                    install_props.install_status += "\nPip not activated, trying bootstrap()"
+                    self.report({'ERROR'}, "Pip not activated, trying bootstrap()")
+                    print("bootstrap failed with: ", e)
             py_exec = bpy.app.binary_path_python
 
         # TODO check permission rights
@@ -173,17 +189,31 @@ class PIPZMQ_OT_pip_pyzmq(bpy.types.Operator):
 
         install_props.install_status += "\nPip activated! Updating pip..."
         self.report({'INFO'}, "Pip activated! Updating pip...")
-        if subprocess.call([py_exec, "-m", "pip", "install", "--upgrade", "pip"]) != 0:
-            install_props.install_status += "\nCouldn't update pip."
-            self.report({'ERROR'}, "Couldn't update pip.")
+
+        # pip update
+        try:
+            print("Trying pip upgrade")
+            output = subprocess.check_output([py_exec, '-m', 'pip', 'install', '--upgrade', 'pip'])
+            print(output)
+        except subprocess.CalledProcessError as e:
+            install_props.install_status += "\nCouldn't update pip. Please restart Blender and try again."
+            self.report({'ERROR'}, "Couldn't update pip. Please restart Blender and try again.")
+            print(e.output)
             return {'CANCELLED'}
         install_props.install_status += "\nPip working! Installing pyzmq..."
         self.report({'INFO'}, "Pip working! Installing pyzmq...")
 
-        if subprocess.call([py_exec, "-m", "pip", "install", "pyzmq"]) != 0:
+        # pyzmq pip install
+        try:
+            print("Trying pyzmq install")
+            output = subprocess.check_output([py_exec, '-m', 'pip', 'install', 'pyzmq'])
+            print(output)
+        except subprocess.CalledProcessError as e:
             install_props.install_status += "\nCouldn't install pyzmq."
             self.report({'ERROR'}, "Couldn't install pyzmq.")
+            print(e.output)
             return {'CANCELLED'}
+
         install_props.install_status += "\npyzmq installed! READY!"
         self.report({'INFO'}, "pyzmq installed! READY!")
 
