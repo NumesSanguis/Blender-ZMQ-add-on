@@ -22,8 +22,8 @@
 bl_info = {
     "name": "blendzmq",
     "author": "Stef van der Struijk",
-    "version": (1, 0),
-    "blender": (2, 80, 0),  # also tested with 2.81
+    "version": (1, 2),
+    "blender": (3, 3, 0),  # also tested with 2.81
     "location": "View3D > Sidebar > Create Tab",
     "description": "Connects Blender with outside programs through ZeroMQ without freezing the interface",
     "warning": "",
@@ -57,6 +57,7 @@ from bpy.props import (
 from . blendzmq_props import PIPZMQProperties, ZMQSocketProperties
 from . blendzmq_panel import BLENDZMQ_PT_zmqConnector
 from . blendzmq_ops import SOCKET_OT_connect_subscriber, PIPZMQ_OT_pip_pyzmq
+# from bpy.app.handlers import persistent
 
 
 # Add-on Preferences
@@ -93,7 +94,15 @@ classes = (
     SOCKET_OT_connect_subscriber,
     BlendzmqPreferences,
     BLENDZMQ_PT_zmqConnector,
-    )
+)
+
+
+# # connect socket at startup
+# # prevent error: AttributeError: '_RestrictContext' object has no attribute 'view_layer'
+# @persistent
+# def delayed_start(scene):
+#     print("Delayed start function")
+#     bpy.ops.bbpsocket.connect_subscriber()
 
 
 # one-liner to (un)register if no property registration was needed
@@ -104,6 +113,7 @@ def register():
         bpy.utils.register_class(cls)
     bpy.types.WindowManager.install_props = PointerProperty(type=PIPZMQProperties)
     bpy.types.WindowManager.socket_settings = PointerProperty(type=ZMQSocketProperties)
+    # bpy.app.handlers.load_post.append(delayed_start)
 
 
 def unregister():

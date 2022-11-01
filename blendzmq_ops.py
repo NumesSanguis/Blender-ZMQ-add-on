@@ -146,6 +146,21 @@ class PIPZMQ_OT_pip_pyzmq(bpy.types.Operator):
     def execute(self, context):  # execute() is called when running the operator.
         install_props = context.window_manager.install_props
 
+        # enable/import pip
+        py_exec = self.ensure_pip(install_props=install_props)
+        # update pip to latest version; not necessary anymore (tested 2.93 LTS & 3.3 LTS)
+        if bpy.app.version[0] == 2 and bpy.app.version[1] < 91:
+            self.update_pip(install_props=install_props, py_exec=py_exec)
+        # install PyZMQ
+        self.install_pyzmq(install_props=install_props, py_exec=py_exec)
+
+        return {'FINISHED'}  # Lets Blender know the operator finished successfully
+
+    def ensure_pip(self, install_props):
+        # TODO check permission rights
+        # TODO Windows ask for permission:
+        # https://stackoverflow.com/questions/130763/request-uac-elevation-from-within-a-python-script
+
         # pip in Blender:
         # https://blender.stackexchange.com/questions/139718/install-pip-and-packages-from-within-blender-os-independently/
         # pip 2.81 issues: https://developer.blender.org/T71856
@@ -168,6 +183,10 @@ class PIPZMQ_OT_pip_pyzmq(bpy.types.Operator):
             try:
                 # will likely fail the first time, but works after `ensurepip.bootstrap()` has been called once
                 import pip
+
+                install_props.install_status += "\nPip imported!"
+                self.report({'INFO'}, "Pip imported!")
+            # pip not enabled
             except ModuleNotFoundError as e:
                 # only first attempt will reach here
                 print("Pip import failed with: ", e)
@@ -181,18 +200,24 @@ class PIPZMQ_OT_pip_pyzmq(bpy.types.Operator):
                     install_props.install_status += "\nPip not activated, trying bootstrap()"
                     self.report({'ERROR'}, "Pip not activated, trying bootstrap()")
                     print("bootstrap failed with: ", e)
-            py_exec = bpy.app.binary_path_python
 
-        # TODO check permission rights
-        # TODO Windows ask for permission:
-        #  https://stackoverflow.com/questions/130763/request-uac-elevation-from-within-a-python-script
+                install_props.install_status += "\nPip activated!"
+                self.report({'INFO'}, "Pip activated!")
+            # 2.81 >= Blender < 2.91
+            if bpy.app.version[0] == 2 and bpy.app.version[1] < 91:
+                py_exec = bpy.app.binary_path_python
+            # (tested on 2.93 LTS & 3.3 LTS) Blender >= 2.91
+            else:
+                py_exec = sys.executable
 
-        install_props.install_status += "\nPip activated! Updating pip..."
-        self.report({'INFO'}, "Pip activated! Updating pip...")
+        return py_exec
+
+    def update_pip(self, install_props, py_exec):
+        install_props.install_status += "\nTrying pip upgrade..."
+        self.report({'INFO'}, "Trying pip upgrade...")
 
         # pip update
         try:
-            print("Trying pip upgrade")
             output = subprocess.check_output([py_exec, '-m', 'pip', 'install', '--upgrade', 'pip'])
             print(output)
         except subprocess.CalledProcessError as e:
@@ -200,13 +225,16 @@ class PIPZMQ_OT_pip_pyzmq(bpy.types.Operator):
             self.report({'ERROR'}, "Couldn't update pip. Please restart Blender and try again.")
             print(e.output)
             return {'CANCELLED'}
-        install_props.install_status += "\nPip working! Installing pyzmq..."
-        self.report({'INFO'}, "Pip working! Installing pyzmq...")
+        install_props.install_status += "\nPip working!"
+        self.report({'INFO'}, "Pip working!")
+
+    def install_pyzmq(self, install_props, py_exec):
+        install_props.install_status += "\nTrying pyzmq install..."
+        self.report({'INFO'}, "Trying pyzmq install...")
 
         # pyzmq pip install
         try:
-            print("Trying pyzmq install")
-            output = subprocess.check_output([py_exec, '-m', 'pip', 'install', 'pyzmq'])
+            output = subprocess.check_output([py_exec, '-m', 'pip', 'install', 'pyzmq==24.0.*'])
             print(output)
         except subprocess.CalledProcessError as e:
             install_props.install_status += "\nCouldn't install pyzmq."
@@ -216,8 +244,6 @@ class PIPZMQ_OT_pip_pyzmq(bpy.types.Operator):
 
         install_props.install_status += "\npyzmq installed! READY!"
         self.report({'INFO'}, "pyzmq installed! READY!")
-
-        return {'FINISHED'}  # Lets Blender know the operator finished successfully
 
 
 def register():

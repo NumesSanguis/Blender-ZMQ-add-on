@@ -3,7 +3,14 @@ Blender 2.8x add-on that allows streaming of data (from another computer) into B
 **without** freezing the interface (publisher-subscriber pattern).
 
 ## Update
-- v1.1 (2020-02-10) - **Blender 2.81+ pip support**: In Blender 2.81 pip is enabled by default.
+- v1.2 (2022-11-01) - Now supports **Blender version 2.93 LTS and 3.3 LTS**! Changes:
+    - No Blender restart required anymore
+    - Python binary has to be accessed from `sys.executable` from v2.93 (rather than `bpy.app.binary_path_python`)
+    - Slightly refracted code in `PIPZMQ_OT_pip_pyzmq`
+    - Blender < 2.93 functioning unchanged
+    - Test scripts moved under `utils/`
+- v1.1 (2020-02-10)
+    - **Blender 2.81+ pip support**: In Blender 2.81 pip is enabled by default.
 This update takes that behavior into account. If the `Enable pip & install pyzmq` button fails, it still executes
 `ensurepip.bootstrap()`. Restart Blender and try again, it will work this time
 (on Windows make sure you run with admin rights).
@@ -32,14 +39,14 @@ You can take this add-on as an example on how to connect your own programs with 
 
 
 ## Prerequisite
-- Python (tested with 3.7, probably 2.7, 3.5+ works too) on your system with `pyzmq`
+- Python (tested with 3.10, probably 2.7, 3.5+ works too) on your system with `pyzmq`
 for programs outside Blender.
    - Anaconda (recommended to manage Python environments)
-     1. Anaconda 3.7+: https://www.anaconda.com/distribution/
-     2. `conda create --name bzmq python=3.7`  # create environment with Python 3.7
+     1. Anaconda 3.10+: https://www.anaconda.com/distribution/
+     2. `conda create --name bzmq python=3.10`  # create environment with Python 3.7
      3. `conda activate bzmq`  # activate newly created environment
-     4. `conda install -c anaconda pyzmq`  # install pyzmq in this environment
-   - System Python: `pip install pyzmq`
+     4. `conda install -c anaconda pyzmq=24.0`  # install pyzmq in this environment
+   - System Python: `pip install pyzmq=24.0.*`
 
 ## How to use
 1. Download this repository as a .zip by:
@@ -59,7 +66,7 @@ for programs outside Blender.
    1. Get script by:
       * Unziping the .zip downloaded in step 1
       * In terminal: `git clone https://github.com/NumesSanguis/Blender-ZMQ-add-on`
-   2. Open a terminal and navigate to `cd *path*/Blender-ZMQ-add-on`
+   2. Open a terminal and navigate to `cd *path*/Blender-ZMQ-add-on/utils`
    3. Make sure conda / virtual env is active (e.g. `conda activate bzmq`) with `pyzmq`
    4. Execute: `python zmq_pub_number_gen.py` (Change ip or port by adding `--ip 192.168.x.x` and/or `--port 8080`)
 1. See objects moving!
