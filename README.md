@@ -3,17 +3,23 @@ Blender 2.8x add-on that allows streaming of data (from another computer) into B
 **without** freezing the interface (publisher-subscriber pattern).
 
 ## Update
+- v1.2.1 (2022-11-13) - Fixed Python libraries (`pyzmq`) not findable when installed in userspace
+    - On **Windows**, pip installed libraries might be installed outside the Blender dir.
+      When failing to import a library, an extra import attempt adds `site.getusersitepackages()` to `sys.path`.
+        - Blender on Windows might be installed under: `C:\Program Files\Blender Foundation\Blender 3.3\3.3\python\bin\python.EXE`.
+          However, even when referring to this binary, libraries might still be installed under e.g.
+          `C:\users\{user}\appdata\roaming\python\python310\site-packages`
 - v1.2 (2022-11-01) - Now supports **Blender version 2.93 LTS and 3.3 LTS**! Changes:
     - No Blender restart required anymore
     - Python binary has to be accessed from `sys.executable` from v2.93 (rather than `bpy.app.binary_path_python`)
     - Slightly refracted code in `PIPZMQ_OT_pip_pyzmq`
     - Blender < 2.93 functioning unchanged
     - Test scripts moved under `utils/`
-- v1.1 (2020-02-10)
-    - **Blender 2.81+ pip support**: In Blender 2.81 pip is enabled by default.
-This update takes that behavior into account. If the `Enable pip & install pyzmq` button fails, it still executes
-`ensurepip.bootstrap()`. Restart Blender and try again, it will work this time
-(on Windows make sure you run with admin rights).
+- v1.1 (2020-02-10) - **Blender 2.81+ pip support**. Changes:
+    - In Blender 2.81 pip is enabled by default. This update takes that behavior into account.
+        - If the `Enable pip & install pyzmq` button fails, it still executes
+        `ensurepip.bootstrap()`. Restart Blender and try again, it will work this time
+        (on Windows make sure you run with admin rights).
 
 ## Overview
 Blender is very powerful software, but if you run your own code that's a bit heavy, you quickly make the interface
@@ -45,7 +51,7 @@ for programs outside Blender.
      1. Anaconda 3.10+: https://www.anaconda.com/distribution/
      2. `conda create --name bzmq python=3.10`  # create environment with Python 3.7
      3. `conda activate bzmq`  # activate newly created environment
-     4. `conda install -c anaconda pyzmq=24.0`  # install pyzmq in this environment
+     4. `conda install -c conda-forge pyzmq=24.0`  # install pyzmq in this environment
    - System Python: `pip install pyzmq=24.0.*`
 
 ## How to use

@@ -18,6 +18,9 @@
 
 # Copyright (c) Stef van der Struijk <stefstruijk@protonmail.ch>
 
+import os
+import sys
+import site
 import bpy
 from bpy.types import Panel
 
@@ -42,7 +45,15 @@ class BLENDZMQ_PT_zmqConnector(Panel):
         #   check if pyzmq is installed; will fail with an ImportError if not
         # if installed, will show interaction options: (dis)connect socket and whether to use dynamic object selection
         try:
-            import zmq
+            # attempt 1: installed and on Python sys path
+            try:
+                import zmq
+            # attempt 2: maybe installed, but not yet in sys path (Windows)
+            except ImportError:
+                user_site_packages = site.getusersitepackages()
+                if os.path.exists(user_site_packages) and user_site_packages not in sys.path:
+                    sys.path.append(user_site_packages)
+                import zmq
 
             # connection information
             row = layout.row()
