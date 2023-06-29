@@ -1,8 +1,9 @@
 # Blender-ZMQ-add-on (BlendZMQ)
-Blender 2.8x add-on that allows streaming of data (from another computer) into Blender over ZeroMQ sockets,
+Blender 2.8x - 3.6 add-on that allows streaming of data (from another computer) into Blender over ZeroMQ sockets,
 **without** freezing the interface (publisher-subscriber pattern).
 
 ## Update
+- (2023-06-29) Runs fine on Blender 3.6 without making code changes (tested on Ubuntu)
 - v1.2.1 (2022-11-13) - Fixed Python libraries (`pyzmq`) not findable when installed in userspace
     - On **Windows**, pip installed libraries might be installed outside the Blender dir.
       When failing to import a library, an extra import attempt adds `site.getusersitepackages()` to `sys.path`.
